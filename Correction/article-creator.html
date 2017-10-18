@@ -27,6 +27,7 @@
                     <li class="list-group-item column" data-column="4,8"><span class="badge"><i class="glyphicon glyphicon-plus"></i></span> 2 colonne petit droit</li>
                     <li class="list-group-item column" data-column="4,4,4"><span class="badge"><i class="glyphicon glyphicon-plus"></i></span> 3 colonne</li>
                     <li class="list-group-item column" data-column="3,3,3,3"><span class="badge"><i class="glyphicon glyphicon-plus"></i></span> 4 colonne</li>
+                    <li class="list-group-item column" data-column="2,2,2,2,2,2"><span class="badge"><i class="glyphicon glyphicon-plus"></i></span> 6 colonne</li>
                 </ul>
             </div>
             <div class="panel-footer">
@@ -67,48 +68,6 @@
     </div>
 </div>
 
-<div class="modal fade" tabindex="-1" role="dialog" id="text-modal">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Modification du texte</h4>
-            </div>
-            <div class="modal-body">
-                <textarea id="text-content-area">
-
-                </textarea>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="saveTextModule()">Sauvegarder</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" tabindex="-1" role="dialog" id="youtube-modal">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Modification de youtube</h4>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Url de la vidéo Youtube</label>
-                    <input type="url" id="youtube-content-url" class="form-control">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="saveYoutubeModule()">Sauvegarder</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script src="https://cdn.ckeditor.com/ckeditor5/1.0.0-alpha.1/classic/ckeditor.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCSGviqWFmjq6gjLveBMNdzAwpj11SkD_o&callback=initMap"></script>

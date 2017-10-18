@@ -12,7 +12,7 @@ var defaultModuleValues = {
 
 var defaultTemplate = {
     text: "<p>#value</p>",
-    image: "<img src='#value'>",
+    image: "<img src='#value' class='img-editor'>",
     youtube: '<iframe width="560" height="315" src="https://www.youtube.com/embed/#value" frameborder="0" allowfullscreen></iframe>',
     vimeo: '<iframe src="https://player.vimeo.com/video/#value" width="640" height="360" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>',
 }
@@ -21,6 +21,13 @@ var config = {
     youtube: {
         baseUrl: 'https://www.youtube.com/watch?v=#value',
         baseTemplateUrl: 'https://www.youtube.com/embed/#value'
+    },
+    vimeo: {
+        baseUrl: 'https://vimeo.com/#value',
+        baseTemplateUrl: 'https://player.vimeo.com/video/#value'
+    },
+    map: {
+        active: false
     }
 }
 
@@ -28,10 +35,12 @@ var currentIdEdit = null;
 
 var modalTextEditor = null;
 
+var previewMap = null;
+var previewMarker = null;
+
 function generateUniqueId()
 {
     let ret = new Date().getTime();
-    console.log(ret);
     return ret;
 }
 
@@ -87,7 +96,8 @@ function updateDropArea()
                 newDiv.append('<div class="toolbox-content"><button class="btn btn-info editModule"><i class="fa fa-edit"></i></button><button class="btn btn-danger deleteModule"><i class="fa fa-times"></i></button></div>');
                 if (data == 'map')
                 {
-
+                    newDiv.append('<div id="map' + generateUniqueId() + '" class="map-preview" data-lat="' + defaultModuleValues.map.lat + '" data-lon="' + defaultModuleValues.map.lon + '" data-zoom="' + defaultModuleValues.map.zoom + '"></div>')
+                    $(this).append(newDiv);
                 }
                 else
                 {
@@ -112,6 +122,46 @@ function updateDropArea()
         $(this).click(function() {
             $(this).parent().parent().remove();
         })
+    })
+    if (config.map.active)
+    {
+        $(".map-preview").each(function() {
+            let lat = parseFloat($(this).attr('data-lat'));
+            let lon = parseFloat($(this).attr('data-lon'));
+            let zoom = parseInt($(this).attr('data-zoom'));
+            let id = $(this).attr('id');
+            var map = new GMaps({
+                div: '#' + id,
+                lat: lat,
+                lng: lon,
+                zoom: zoom,
+                disableDefaultUI: true,
+                draggable: false,
+                zoomControl: false,
+                scrollwheel: false,
+                disableDoubleClickZoom: true
+            })
+            console.log('marker position');
+            map.addMarker({
+                lat: lat,
+                lng: lon,
+                title: 'Position'
+            });
+        })
+    }
+    $.ajax({
+        url: 'send_modification.php',
+        type: "POST",
+        data: {
+            id: globalId,
+            content: generateSaveHTML()
+        },
+        success: function(data) {
+            console.log(data);
+        },
+        error: function(data) {
+            console.log(data);
+        }
     })
 }
 
@@ -141,18 +191,41 @@ function saveYoutubeModule()
         value = spUrl[spUrl.length - 1];
     }
     iframeY.attr('src', config.youtube.baseTemplateUrl.replace('#value', value));
+    updateDropArea();
+}
+
+function saveVimeoModule()
+{
+    let iframeV = $("#" + currentIdEdit).find('iframe');
+    let url = $("#vimeo-content-url").val();
+    if (value == '')
+    {
+        spUrl = url.split('/');
+        value = spUrl[spUrl.length - 1];
+    }
+    iframeV.attr('src', config.vimeo.baseTemplateUrl.replace('#value', value));
+    updateDropArea();
+}
+
+function saveImageModule()
+{
+    let img = $("#preview-image").attr('src');
+    $("#" + currentIdEdit).find('img').attr('src', img);
+    updateDropArea();
+}
+
+function saveMapModule()
+{
+    let map = $("#" + currentIdEdit).find('map-preview');
+    map.attr('data-lat'. $("#map-content-lat").val());
+    map.attr('data-lon'. $("#map-content-lon").val());
+    map.attr('data-zoom'. $("#map-content-zoom").val());
+    updateDropArea();
 }
 
 function initMap() {
-    var uluru = {lat: -25.363, lng: 131.044};
-    var map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 4,
-        center: uluru
-    });
-    var marker = new google.maps.Marker({
-        position: uluru,
-        map: map
-    });
+    config.map.active = true;
+    updateDropArea();
 }
 
 ClassicEditor
@@ -163,6 +236,72 @@ ClassicEditor
 .catch( error => {
     console.error( 'Probleme avec l\'editeur de texte' );
 } );
+
+$('[data-toggle="popover"]').popover();
+
+function loadImage() {
+    $("#loading-dir-image").show();
+    $("#error-loading-dir").hide();
+    $("#image-container").html('');
+    $.ajax({
+        url: 'upload/',
+        success: function(data) {
+            $("#loading-dir-image").hide();
+            $(data).find("a").attr("href", function (i, val) {
+                if( val.match(/\.(jpe?g|png|gif)$/) ) {
+                    $("#image-container").append('<div class="col-xs-6 col-md-3 image-col"><a href="javascript:void(0)" class="thumbail image-sized"><img src="upload/' + val + '"></img></a></div>')
+                }
+            });
+            $(".image-sized").each(function() {
+                $(this).click(function() {
+                    let src = $(this).find('img').attr('src');
+                    $("#preview-image").attr('src', src);
+                })
+            })
+        },
+        error: function() {
+            $("#loading-dir-image").hide();
+            $("#error-loading-dir").show();
+        }
+    })
+}
+
+$("#new-image-form").submit(function(e) {
+    e.preventDefault();
+    $("#new-image-form").hide();
+    $("#error-image").hide();
+    $("#success-image").hide();
+    $("#loading-image").show();
+    $.ajax({
+        url: 'upload-image.php',
+        type: "POST",
+        data: new FormData(this),
+        contentType: false,
+        cache: false,
+        processData:false,
+        success: function(data) {
+            console.log(data);
+            if (data.startsWith('upload/'))
+            {
+                $("#new-image-form").show();
+                $("#loading-image").hide();
+                $("#success-image").show();
+                loadImage();
+            }
+            else
+            {
+                $("#new-image-form").show();
+                $("#loading-image").hide();
+                $("#error-image").show();
+            }
+        },
+        error: function() {
+            $("#new-image-form").show();
+            $("#loading-image").hide();
+            $("#error-image").show();
+        }
+    })
+})
 
 $("#text-modal").on('shown.bs.modal', function() {
     $("#text-content-area").focus();
@@ -176,3 +315,115 @@ $("#youtube-modal").on('shown.bs.modal', function() {
     let value = spUrl[spUrl.length - 1];
     $("#youtube-content-url").val(config.youtube.baseUrl.replace('#value', value));
 })
+
+$("#vimeo-modal").on('shown.bs.modal', function() {
+    $("#vimeo-content-url").focus();
+    let url = $("#" + currentIdEdit).find('iframe').attr('src');
+    let spUrl = url.split('/');
+    let value = spUrl[spUrl.length - 1];
+    $("#vimeo-content-url").val(config.vimeo.baseUrl.replace('#value', value));
+})
+
+$("#image-modal").on('shown.bs.modal', function() {
+    $("#preview-image").attr('src', $("#" + currentIdEdit).find('img').attr('src'));
+    $("#new-image-form").show();
+    $("#error-image").hide();
+    $("#success-image").hide();
+    $("#loading-image").hide();
+    loadImage();
+})
+
+$("#map-modal").on('shown.bs.modal', function() {
+    let map = $("#" + currentIdEdit).find('.map-preview');
+    let lat = parseFloat(map.attr('data-lat'));
+    let lon = parseFloat(map.attr('data-lon'));
+    let zoom = parseFloat(map.attr('data-zoom'));
+    $("#map-content-lat").val(lat);
+    $("#map-content-lon").val(lon);
+    $("#map-content-zoom").val(zoom);
+    previewMap = new GMaps({
+        div: '#preview-map',
+        lat: lat,
+        lng: lon,
+        zoom: zoom,
+        width: 568,
+        height: 400,
+        disableDefaultUI: true,
+        draggable: false,
+        zoomControl: false,
+        scrollwheel: false,
+        disableDoubleClickZoom: true
+    })
+    previewMarker = previewMap.addMarker({
+        lat: lat,
+        lng: lon,
+        title: 'Position'
+    });
+})
+
+$("#map-content-lat").change(function() {
+    previewMap.setCenter(parseFloat($("#map-content-lat").val()), parseFloat($("#map-content-lon").val()));
+    previewMarker.setPosition({lat: parseFloat($("#map-content-lat").val()), lng: parseFloat($("#map-content-lon").val())})
+    previewMap.refresh();
+    console.log(previewMap);
+});
+
+$("#map-content-lon").change(function() {
+    previewMap.setCenter(parseFloat($("#map-content-lat").val()), parseFloat($("#map-content-lon").val()));
+});
+
+$("#map-content-zoom").change(function() {
+    previewMap.setZoom(parseFloat($("#map-content-zoom").val()))
+})
+
+function generateSaveHTML()
+{
+    var htmlSave = $("#drop-area").html();
+    htmlSave = htmlSave.replace('<div class="label-canvas">Contenu de la page</div>', '');
+    return htmlSave;
+}
+
+function generateHTML()
+{
+    var html = $("<div>" + generateSaveHTML() + "</div>");
+    html.find('.toolbox-content').each(function() {
+        $(this).remove();
+    })
+    html.find('.label-canvas').remove();
+    html.find('.ui-sortable-handle').removeClass('ui-sortable-handle');
+    html.find('.ui-sortable').removeClass('ui-sortable');
+    html.find('.ui-droppable').removeClass('ui-droppable');
+    html.find('.column-edit').removeClass('column-edit');
+    html.find('.module-edit').each(function() {
+        $(this).removeClass('module-edit');
+        $(this).addClass('ac-content');
+    })
+    html.find('.img-editor').addClass('ac-img');
+    html.find('.img-editor').removeClass('img-editor');
+    html.find('.map-preview').addClass('ac-map');
+    html.find('.map-preview').removeClass('map-preview');
+    html.find('[data-module="text"]').addClass('ac-module-text');
+    html.find('[data-module="youtube"]').addClass('ac-module-youtube');
+    html.find('[data-module="vimeo"]').addClass('ac-module-vimeo');
+    html.find('[data-module="map"]').addClass('ac-module-map');
+    html.find('[data-module="image"]').addClass('ac-module-image');
+    return html.html();
+}
+
+$("#button-return").click(edit);
+$("#button-preview").click(preview);
+
+function preview()
+{
+    $("#button-return").show();
+    $("#preview").show();
+    $("#preview").html(generateHTML());
+    $("#edit-page").hide();
+}
+
+function edit()
+{
+    $("#button-return").hide();
+    $("#preview").hide();
+    $("#edit-page").show();
+}

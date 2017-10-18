@@ -1,0 +1,16 @@
+.ac-img {
+    width: 100%;
+}
+
+.ac-map {
+    width: 100%;
+    height: 400px;
+}
+
+.ac-container {
+    width: 1170px;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
