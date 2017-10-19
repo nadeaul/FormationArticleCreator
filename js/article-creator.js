@@ -11,8 +11,8 @@ var defaultModuleValues = {
 }
 
 var defaultTemplate = {
-    text: "<p>#value</p>",
-    image: "<img src='#value' class='img-editor'>",
+    text: "<div class='edit-text-template'>#value</div>",
+    image: "<img src='#value' class='img-editor' alt='Image'>",
     youtube: '<iframe width="560" height="315" src="https://www.youtube.com/embed/#value" frameborder="0" allowfullscreen></iframe>',
     vimeo: '<iframe src="https://player.vimeo.com/video/#value" width="640" height="360" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>',
 }
@@ -82,6 +82,7 @@ function updateDropArea()
     $(".deleteRow").each(function() {
         $(this).click(function() {
             $(this).parent().parent().remove();
+            updateDropArea();
         })
     })
     $(".column-edit").each(function() {
@@ -121,6 +122,7 @@ function updateDropArea()
     $(".deleteModule").each(function() {
         $(this).click(function() {
             $(this).parent().parent().remove();
+            updateDropArea();
         })
     })
     if (config.map.active)
@@ -167,8 +169,8 @@ function updateDropArea()
 
 function saveTextModule()
 {
-    $("#" + currentIdEdit).find('p').remove();
-    $("#" + currentIdEdit).append(modalTextEditor.getData());
+    $("#" + currentIdEdit).find('.edit-text-template').html(modalTextEditor.val());
+    updateDropArea();
 }
 
 function saveYoutubeModule()
@@ -210,6 +212,8 @@ function saveVimeoModule()
 function saveImageModule()
 {
     let img = $("#preview-image").attr('src');
+    let alt = $("#alt-text").val();
+    $("#" + currentIdEdit).find('img').attr('alt', alt);
     $("#" + currentIdEdit).find('img').attr('src', img);
     updateDropArea();
 }
@@ -228,16 +232,11 @@ function initMap() {
     updateDropArea();
 }
 
-ClassicEditor
-.create( document.querySelector( '#text-content-area' ) )
-.then( editor => {
-    modalTextEditor = editor;
-} )
-.catch( error => {
-    console.error( 'Probleme avec l\'editeur de texte' );
-} );
-
-$('[data-toggle="popover"]').popover();
+$(function() {
+    $("#text-content-area").ckeditor();
+    modalTextEditor = $("#text-content-area");
+    $('[data-toggle="popover"]').popover();
+})
 
 function loadImage() {
     $("#loading-dir-image").show();
@@ -305,7 +304,7 @@ $("#new-image-form").submit(function(e) {
 
 $("#text-modal").on('shown.bs.modal', function() {
     $("#text-content-area").focus();
-    modalTextEditor.setData('<p>' + $("#" + currentIdEdit).find('p').html() + '</p>');
+    modalTextEditor.val($("#" + currentIdEdit).find('.edit-text-template').html());
 })
 
 $("#youtube-modal").on('shown.bs.modal', function() {
@@ -326,6 +325,7 @@ $("#vimeo-modal").on('shown.bs.modal', function() {
 
 $("#image-modal").on('shown.bs.modal', function() {
     $("#preview-image").attr('src', $("#" + currentIdEdit).find('img').attr('src'));
+    $("#alt-text").val($("#" + currentIdEdit).find('img').attr('alt'));
     $("#new-image-form").show();
     $("#error-image").hide();
     $("#success-image").hide();

@@ -23,6 +23,18 @@ if(isset($_FILES["file"]["type"]))
                 $extension_value++;
             }
             $sourcePath = $_FILES['file']['tmp_name'];
+            if (file_exists('upload'))
+            {
+                if (!is_dir('upload'))
+                {
+                    unlink('upload');
+                    mkdir('upload');
+                }
+            }
+            else
+            {
+                mkdir('upload');
+            }
             $targetPath = "upload/" . $name . $extension;
             move_uploaded_file($sourcePath,$targetPath) ;
             echo $targetPath;

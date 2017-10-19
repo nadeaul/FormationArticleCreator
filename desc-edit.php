@@ -12,6 +12,7 @@ if (isset($_POST['submit']) && $_POST['submit'] == 'true')
         $req->bindValue(':image', $_POST['image'], PDO::PARAM_STR);
         $req->bindValue(':id', $_POST['id']);
         $req->execute();
+        header('Location: dashboard.php');
     }
     catch(Exception $e)
     {
@@ -24,16 +25,17 @@ $req = $pdo->prepare('SELECT * FROM articles WHERE id = :id');
 if (isset($_GET['id']))
 {
     $req->bindValue(':id', $_GET['id']);
+    $req->execute();
+    $res = $req->fetch(PDO::FETCH_OBJ);
 }
 else
 {
     $newRq = $pdo->query('INSERT INTO articles (title, description) VALUES ("Nouvelle article", "Description")');
     $newRq->execute();
     $id = $pdo->lastInsertId();
-    $req->bindValue(':id', $id);
+    header('Location: desc-edit.php?id=' . $id);
+    exit();
 }
-$req->execute();
-$res = $req->fetch(PDO::FETCH_OBJ);
 ?>
 <html>
 <head>
@@ -68,7 +70,7 @@ $res = $req->fetch(PDO::FETCH_OBJ);
                         </div>
                         <div class="form-group">
                             <label>Description de l'article</label>
-                            <textarea name="description" id="description">
+                            <textarea name="description" id="description" rows="3">
                                 <?php echo $res->description ?>
                             </textarea>
                         </div>
@@ -148,20 +150,17 @@ $res = $req->fetch(PDO::FETCH_OBJ);
         </div>
     </div>
 
-    <script src="https://cdn.ckeditor.com/ckeditor5/1.0.0-alpha.1/classic/ckeditor.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="plugins/ckeditor/ckeditor.js"></script>
+    <script src="plugins/ckeditor/adapters/jquery.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script>
-    ClassicEditor
-    .create( document.querySelector( '#description' ) )
-    .then( editor => {
-        modalTextEditor = editor;
-    } )
-    .catch( error => {
-        console.error( 'Probleme avec l\'editeur de texte' );
-    } );
-    $('[data-toggle="popover"]').popover();
+    $(function() {
+        $('[data-toggle="popover"]').popover();
+        $("#description").ckeditor();
+    })
     function loadImage() {
         $("#loading-dir-image").show();
         $("#error-loading-dir").hide();
