@@ -44,17 +44,7 @@ function generateUniqueId()
     return ret;
 }
 
-$(".column").each(function() { //On récupère toute les colonnes, et on effectue les droppables
-    $(this).draggable({
-        revert: true
-    })
-})
-
-$(".module").each(function() { //On récupère toute les colonnes, et on effectue les droppables
-    $(this).draggable({
-        revert: true
-    })
-})
+$("#drop-area").sortable();
 
 $("#drop-area").droppable({
     accept: ".column", // On accepte que des colonnes
@@ -74,6 +64,20 @@ $("#drop-area").droppable({
         $("#drop-area").append(newRow); // On append la ligne entiere
         updateDropArea();
     }
+})
+
+$(".column").each(function() { //On récupère toute les colonnes, et on effectue les droppables
+    $(this).draggable({
+        revert: true,
+        zIndex: 2500
+    })
+})
+
+$(".module").each(function() { //On récupère toute les colonnes, et on effectue les droppables
+    $(this).draggable({
+        revert: true,
+        zIndex: 2500
+    })
 })
 
 function updateDropArea()
@@ -169,6 +173,7 @@ function updateDropArea()
 
 function saveTextModule()
 {
+    console.log(modalTextEditor.val());
     $("#" + currentIdEdit).find('.edit-text-template').html(modalTextEditor.val());
     updateDropArea();
 }
@@ -379,13 +384,20 @@ $("#map-content-zoom").change(function() {
 function generateSaveHTML()
 {
     var htmlSave = $("#drop-area").html();
-    htmlSave = htmlSave.replace('<div class="label-canvas">Contenu de la page</div>', '');
-    return htmlSave;
+    let ret = $('<div>' + htmlSave + '</div>');
+    console.log(ret);
+    ret.find('.label-drop').each(function() {$(this).remove()});
+    retHtml = ret.html();
+    retHtml = retHtml.replace(/>[\n\t ]+</g, "><");
+    retHtml = retHtml.replace(/[\n\t ]+</g, "<")
+    console.log(retHtml);
+    return retHtml;
 }
 
 function generateHTML()
 {
     var html = $("<div>" + generateSaveHTML() + "</div>");
+    console.log(html.html());
     html.find('.toolbox-content').each(function() {
         $(this).remove();
     })
@@ -427,3 +439,30 @@ function edit()
     $("#preview").hide();
     $("#edit-page").show();
 }
+
+$("#button-publish").click(function() {
+    let html = generateHTML();
+    $.ajax({
+        url: 'generate_html.php',
+        type: "POST",
+        data: {
+            'content': html,
+            'id': globalId
+        },
+        success: function(data) {
+            if (data == 'OK')
+            {
+                $("#success-publish").show();
+                $("#error-publish").hide();
+            }
+            else
+            {
+                $("#success-publish").hide();
+                $("#error-publish").show();
+            }
+        },
+        error: function() {
+
+        }
+    })
+})

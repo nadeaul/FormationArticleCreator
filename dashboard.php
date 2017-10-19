@@ -11,6 +11,7 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <li class="active"><a href="#">Liste des articles</a></li>
+                    <li class=""><a href="site/index.php">Site web</a></li>
                 </ul>
             </div>
         </div>
@@ -38,7 +39,18 @@
                             $q = $pdo->query('SELECT * FROM articles');
                             $articles = $q->fetchAll(PDO::FETCH_OBJ);
                             foreach ($articles as $key => $value) {
-                                echo '<tr><th>' . $value->title . '</th><th>' . $value->description . '</th><th><a href="desc-edit.php?id=' . $value->id . '" class="btn btn-xs btn-warning">Editer la description</a>&nbsp;<a href="article-creator.php?id=' . $value->id . '" class="btn btn-xs btn-info">Editer le contenu</a></th></tr>';
+                                echo '<tr><th>' . $value->title . '</th><th>' . $value->description . '</th><th><a href="desc-edit.php?id=' . $value->id . '" class="btn btn-xs btn-warning">Editer la description</a>&nbsp;<a href="article-creator.php?id=' . $value->id . '" class="btn btn-xs btn-info">Editer le contenu</a>';
+                                if ($value->has_data)
+                                {
+                                    echo '<button class="btn btn-success btn-xs publish" data-id="' . $value->id . '" onclick="publish_article(' . $value->id . ')" ' . ($value->is_published ? 'style="display:none;"' : '') . '>Publier</button>';
+                                    echo '<button class="btn btn-warning btn-xs unpublish" data-id="' . $value->id . '" onclick="disable_article(' . $value->id . ')" ' . (!$value->is_published ? 'style="display:none;"' : '') . '>Retirer de la publication</button>';
+                                }
+                                else
+                                {
+                                    echo '<br><span class="label label-warning">Le contenu n\'a pas été généré dans l\'éditeur de contenu.</span>';
+                                }
+
+                                echo '</th></tr>';
                             }
                             ?>
                         </tbody>
@@ -47,6 +59,45 @@
             </div>
         </div>
     </div>
+
+    <script>
+    function publish_article(id)
+    {
+        $.ajax({
+            url: 'active_article.php',
+            type: 'POST',
+            data: {
+                id: id,
+                published: 1
+            },
+            success: function(data) {
+                if (data == 'OK')
+                {
+                    $(".publish[data-id=" + id + "]").hide();
+                    $(".unpublish[data-id=" + id + "]").show();
+                }
+            }
+        })
+    }
+    function disable_article(id)
+    {
+        $.ajax({
+            url: 'active_article.php',
+            type: 'POST',
+            data: {
+                id: id,
+                published: 0
+            },
+            success: function(data) {
+                if (data == 'OK')
+                {
+                    $(".publish[data-id=" + id + "]").show();
+                    $(".unpublish[data-id=" + id + "]").hide();
+                }
+            }
+        })
+    }
+    </script>
 
     <script src="https://cdn.ckeditor.com/ckeditor5/1.0.0-alpha.1/classic/ckeditor.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>

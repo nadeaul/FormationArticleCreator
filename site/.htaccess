@@ -1,0 +1,4 @@
+Options +FollowSymlinks
+RewriteEngine On
+RewriteRule ^index\.html$ index.php [L]
+RewriteRule ^article-([0-9]+)-([a-z0-9\-]+)\.html$ article-view.php?id=$1 [L]

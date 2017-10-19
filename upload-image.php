@@ -18,10 +18,6 @@ if(isset($_FILES["file"]["type"]))
             $name = $_FILES["file"]["name"];
             $extension = "";
             $extension_value = 1;
-            while (file_exists("upload/" . $name . $extension)) {
-                $extension = $extension_value;
-                $extension_value++;
-            }
             $sourcePath = $_FILES['file']['tmp_name'];
             if (file_exists('upload'))
             {
@@ -34,6 +30,10 @@ if(isset($_FILES["file"]["type"]))
             else
             {
                 mkdir('upload');
+            }
+            while (file_exists("upload/" . $name . $extension)) {
+                $extension = $extension_value;
+                $extension_value++;
             }
             $targetPath = "upload/" . $name . $extension;
             move_uploaded_file($sourcePath,$targetPath) ;

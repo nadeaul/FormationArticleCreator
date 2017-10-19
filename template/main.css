@@ -14,3 +14,9 @@
     margin-right: auto;
     margin-left: auto;
 }
+
+.ac-title-header {
+    text-align: center;
+    padding-bottom: 16px;
+    border-bottom: 1px solid grey;
+}

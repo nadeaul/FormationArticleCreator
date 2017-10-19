@@ -32,3 +32,22 @@
     width: 100%;
     max-width: 300px;
 }
+
+.full-width-img {
+    display:block;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.article-view {
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-bottom: 16px;
+    padding-top: 16px;
+}
+
+.date-span {
+    font-size: small;
+    color: #95a5a6;
+}

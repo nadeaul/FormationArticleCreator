@@ -19,6 +19,7 @@ $res = $req->fetch(PDO::FETCH_OBJ);
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <li><a href="dashboard.php">Liste des articles</a></li>
+                    <li class=""><a href="site/index.php">Site web</a></li>
                 </ul>
             </div>
         </div>
@@ -89,13 +90,20 @@ $res = $req->fetch(PDO::FETCH_OBJ);
                 </div>
                 <div class="panel-body collapse in" id="action-list">
                     <button class="btn btn-primary btn-block" id="button-preview">Prévisualiser</button>
+                    <button class="btn btn-success btn-block" id="button-publish">Publier</button>
+                    <div class="alert alert-info" role="alert" id="success-publish" style="display:none;">
+                        <b>Succès ! </b> La publication est réussi !
+                    </div>
+                    <div class="alert alert-danger" role="alert" id="error-publish" style="display:none;">
+                        <b>Erreur : </b> Impossible de générer la page. Veuillez rééssayer.
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-md-10">
             <!-- La div qui contient le contenu de notre article -->
             <div class="canvas-article" id="drop-area">
-                <div class="label-canvas">Contenu de la page</div>
+                <div class="label-canvas label-drop">Contenu de la page</div>
                 <?php
                 if ($res)
                 {
