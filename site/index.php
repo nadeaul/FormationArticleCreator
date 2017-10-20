@@ -135,10 +135,10 @@
 		?>
 		<div class="article-view">
 			<div class="row">
-				<div class="col-md-2">
+				<div class="col-sm-4 col-md-3 col-lg-2">
 					<img src="../<?php echo $value->image; ?>" alt="<?php echo $value->alt_image; ?>" class="full-width-img">
 				</div>
-				<div class='col-md-10'>
+				<div class='col-sm-8 col-md-9 col-lg-10'>
 					<span class="date-span pull-right"><?php echo $date->format('d/m/Y H:m:i'); ?></span>
 					<h2><?php echo $value->title; ?></h2>
 					<hr>

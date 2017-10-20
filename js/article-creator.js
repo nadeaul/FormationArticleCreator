@@ -145,7 +145,7 @@ function updateDropArea()
                 newDiv.attr('id', generateUniqueId()); // On génère un id unique au module
                 // On ajoute au module un bouton d'édition et un bouton de suppréssion
                 newDiv.append('<div class="toolbox-content"><button class="btn btn-info editModule"><i class="fa fa-edit"></i></button><button class="btn btn-danger deleteModule"><i class="fa fa-times"></i></button></div>');
-                if (defaultTemplate[data] == function) // Si le template est une fonction
+                if (defaultTemplate[data] == 'function') // Si le template est une fonction
                 {
                     newDiv.append(defaultTemplate[data]()); // On append le résultat de la fonction
                 }
@@ -270,11 +270,11 @@ function saveImageModule() // Fonction de sauvegarde d'image
 
 function saveMapModule() // Fonction de sauvegarde de map
 {
-    let map = $("#" + currentIdEdit).find('map-preview'); // On récupère la map
+    let map = $("#" + currentIdEdit).find('.map-preview'); // On récupère la map
     // On met à jour les dataset par rapport au valeur rentré
-    map.attr('data-lat'. $("#map-content-lat").val());
-    map.attr('data-lon'. $("#map-content-lon").val());
-    map.attr('data-zoom'. $("#map-content-zoom").val());
+    map.attr('data-lat', $("#map-content-lat").val());
+    map.attr('data-lon', $("#map-content-lon").val());
+    map.attr('data-zoom', $("#map-content-zoom").val());
     updateDropArea();
 }
 
@@ -407,15 +407,17 @@ $("#map-modal").on('shown.bs.modal', function() {
     });
 })
 
+// Si on met à jour la lattitude, longitude ou le zoom, on modifie la map et le marker
 $("#map-content-lat").change(function() {
     previewMap.setCenter(parseFloat($("#map-content-lat").val()), parseFloat($("#map-content-lon").val()));
     previewMarker.setPosition({lat: parseFloat($("#map-content-lat").val()), lng: parseFloat($("#map-content-lon").val())})
     previewMap.refresh();
-    console.log(previewMap);
 });
 
 $("#map-content-lon").change(function() {
     previewMap.setCenter(parseFloat($("#map-content-lat").val()), parseFloat($("#map-content-lon").val()));
+    previewMarker.setPosition({lat: parseFloat($("#map-content-lat").val()), lng: parseFloat($("#map-content-lon").val())})
+    previewMap.refresh();
 });
 
 $("#map-content-zoom").change(function() {

@@ -136,6 +136,36 @@
 
 	<!-- Main JS (Do not remove) -->
 	<script src="js/main.js"></script>
-
+	<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCSGviqWFmjq6gjLveBMNdzAwpj11SkD_o&callback=initMap"></script>
+	<script src="../dist/js/gmaps.js"></script>
+	<script>
+	function initMap() {
+		$(".ac-map").each(function() { // Pour chaque map
+			// On récupère les données stocker en dataset (Lat, Lon et Zoom) et l'id
+			let lat = parseFloat($(this).attr('data-lat'));
+			let lon = parseFloat($(this).attr('data-lon'));
+			let zoom = parseInt($(this).attr('data-zoom'));
+			let id = $(this).attr('id');
+			var map = new GMaps({ // On initialise la map
+				div: '#' + id,
+				lat: lat,
+				lng: lon,
+				zoom: zoom,
+				// On désactive l'interface de la map
+				disableDefaultUI: true,
+				draggable: false,
+				zoomControl: false,
+				scrollwheel: false,
+				disableDoubleClickZoom: true
+			})
+			// On ajoute un marker sur la map au centre
+			map.addMarker({
+				lat: lat,
+				lng: lon,
+				title: 'Position'
+			});
+		})
+	}
+	</script>
 	</body>
 </html>
