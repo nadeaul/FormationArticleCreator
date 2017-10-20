@@ -1,4 +1,6 @@
 <?php
+// Met le HTML dans la partie save de l'article
+
 require 'connexion.php';
 
 $id = intval($_POST['id']);

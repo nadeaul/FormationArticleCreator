@@ -22,19 +22,19 @@ if (isset($_POST['submit']) && $_POST['submit'] == 'true')
 }
 
 $req = $pdo->prepare('SELECT * FROM articles WHERE id = :id');
-if (isset($_GET['id']))
+if (isset($_GET['id'])) // Si l'article existe on le récupère
 {
     $req->bindValue(':id', $_GET['id']);
     $req->execute();
     $res = $req->fetch(PDO::FETCH_OBJ);
 }
-else
+else // Sinon on le créé et on le récupère
 {
     $newRq = $pdo->query('INSERT INTO articles (title, description) VALUES ("Nouvelle article", "Description")');
     $newRq->execute();
     $id = $pdo->lastInsertId();
-    header('Location: desc-edit.php?id=' . $id);
-    exit();
+    $req->bindValue(':id', $id);
+    $req->execute();
 }
 ?>
 <html>
@@ -157,6 +157,7 @@ else
     <script src="plugins/ckeditor/adapters/jquery.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script>
+    // Identique à article-creator, gestion des popover, ckeditor et image
     $(function() {
         $('[data-toggle="popover"]').popover();
         $("#description").ckeditor();

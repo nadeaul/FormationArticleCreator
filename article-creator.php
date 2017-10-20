@@ -1,5 +1,6 @@
 <?php
 require 'connexion.php';
+// On récupère l'article via php
 $req = $pdo->prepare('SELECT * FROM articles WHERE id=:id');
 $req->bindValue(':id', intval($_GET['id']));
 $req->execute();
@@ -105,7 +106,7 @@ $res = $req->fetch(PDO::FETCH_OBJ);
             <div class="canvas-article" id="drop-area">
                 <div class="label-canvas label-drop">Contenu de la page</div>
                 <?php
-                if ($res)
+                if ($res) // Si l'article est chargé on affiche la sauvegarde de l'éditeur
                 {
                     echo $res->save;
                 }
@@ -264,6 +265,26 @@ $res = $req->fetch(PDO::FETCH_OBJ);
         </div>
     </div>
 
+    <div class="modal fade" tabindex="-1" role="dialog" id="delete-modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Suppression</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger">
+                        <b>Attention ! </b> Vous êtes sur le point de supprimer un élément. Etes vous sûr ?
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" id="deleteValidation">Supprimer definitivement</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script src="plugins/ckeditor/ckeditor.js"></script>
@@ -273,7 +294,7 @@ $res = $req->fetch(PDO::FETCH_OBJ);
     <script src="dist/js/gmaps.js"></script>
     <script src="js/article-creator.js"></script>
     <?php
-    if ($res)
+    if ($res) // Si l'article est chargé on créé une variable globalId et on y met l'id de l'article. Puis on met à jour la page.
     {
         ?>
         <script>
