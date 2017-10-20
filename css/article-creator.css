@@ -92,3 +92,12 @@
     width: 100% !important;
     height: 400px !important;
 }
+
+.sidebar-custom {
+    position: fixed;
+    left: 8px;
+    width: 242px;
+    height: 94%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
