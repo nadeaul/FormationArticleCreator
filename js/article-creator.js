@@ -15,7 +15,7 @@ var defaultModuleValues = {
 
 // Valeurs contenant les templates des modules.
 // Lors de la création des modules, on utilise les valeurs html puis on remplace #value  par la valeurs de l'image.
-// La map n'est pas présente car elle requière d'avoir une logique de code
+// La map est présente en fonction qui retourne le code HTML du module
 var defaultTemplate = {
     text: "<div class='edit-text-template'>#value</div>",
     image: "<img src='#value' class='img-editor' alt='Image'>",
@@ -83,7 +83,7 @@ $(function() {
 
     $("#drop-area").droppable({ // On rend la drop-area droppable pour ajouter des colonnes
         accept: ".column", // On accepte que des colonnes
-        drop: function(e, ui) {
+        drop: function(e, ui) { // Lorsque l'utilisateur drop sur la drop-area
             let data = ui.draggable[0].dataset['column']; // On récupère les données mis dans le li
             let columns = data.split(','); // On créé une array afin de récupérer les colonnes
             let newRow = $("<div class='row row-edit'></div>"); // On créé notre nouvelle ligne
